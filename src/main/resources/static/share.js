@@ -69,39 +69,5 @@ function convertDateFromString(dateString) {
 }
 
 
-/**打开地址选择框 用法如下
- * addressSelectWindow("floor",function(res){console.log(res);})
- * @param except 去除那个级别的级联子列表,有region/zjlx/floor/door/house
- * @param callback 回调函数,其中res是选中的节点数据,如{id: "520102", label: "南明区", type: "region"}
- * @returns
- */
-function addressSelectWindow(except,callback){
-	layui.use('layer', function(){
-    	  var layer = layui.layer;
-    	  var index = layer.open({
-	    	  type: 2,
-	    	  title: "选择地址",
-	    	  btn: ['确定','关闭'],
-	    	  content: _ctx+"/sys-house/addressSelect?except="+except,
-	    	  area: ['300px', '80%'],
-	    	  maxmin: true,
-	    	  btnAlign: 'c',
-	    	  offset: ['100px', '200px'],
-	    	  yes: function(index){
-                    //当点击‘确定’按钮的时候，获取弹出层返回的值
-                    var res = window["layui-layer-iframe" + index].callbackdata();
-                    if(res==null){
-                    	layer.msg("请选择适合的节点");
-                    }else{
-                    	layer.close(index);
-                    }
-                    callback(res);
-                }
-	    	});
-    	});
-}
-
-
-
 
 
