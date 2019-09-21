@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>首页</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+<style type="text/css">
+.layui-form-item {
+	width: 80%;
+}
+</style>
+</head>
+<body>
+	<hr class="layui-bg-blue">
+	<form class="layui-form" action="">
+		<div class="layui-form-item">
+			<label class="layui-form-label">主部门</label>
+			<div class="layui-input-block">
+				<input type="text" id="tree" lay-filter="tree" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">账号</label>
+			<div class="layui-input-block">
+				<input type="text" name="account" lay-verify="required|username" autocomplete="off" placeholder="请输入账号,不能有特殊字符" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">密码</label>
+			<div class="layui-input-block">
+				<input type="password" name="password" lay-verify="required|pass" autocomplete="off" placeholder="请输入新密码" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">确认密码</label>
+			<div class="layui-input-block">
+				<input type="password" id="newPasswordConfirm" lay-verify="required|repeatCheck" autocomplete="off" placeholder="请再次输入新密码" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">姓名</label>
+			<div class="layui-input-block">
+				<input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="请输入姓名"  class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">身份证</label>
+			<div class="layui-input-block">
+				<input type="text" name="identity" lay-verify="required|identity" autocomplete="off" placeholder="请输入身份证"  class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">联系电话</label>
+			<div class="layui-input-block">
+				<input type="text" name="phone" lay-verify="required|number" autocomplete="off" placeholder="请输入联系电话" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit="" lay-filter="submitForm">保存</button>
+				<button type="reset" class="layui-btn layui-btn-primary">重新输入</button>
+			</div>
+		</div>
+	</form>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		layui.config({
+			base : _ctx + '/layui/extends/',
+		}).extend({
+			treeSelect : 'treeSelect'
+		});
+
+		layui.use(['treeSelect', 'form', 'layer'], function() {
+			var form = layui.form, layer = layui.layer ,treeSelect= layui.treeSelect,$ = layui.jquery;
+			
+			treeSelect.render({
+	            elem: '#tree',
+	            data: _ctx+'/ministries/tree/',
+	            headers: {},
+	            type: 'post',
+	            // 占位符
+	            placeholder: '目前为根节点',
+	            style: {
+	                folder: {
+	                    enable: true
+	                },
+	                line: {
+	                    enable: true
+	                }
+	            },
+	            click: function(d){
+	                $('#tree').val(d.current.id);
+	            },
+	            // 加载完成后的回调函数
+	            success: function (d) {
+	               try{
+	            	   treeSelect.checkNode('tree', [[${ministriesId}]]);//选中节点，根据id筛选
+	            	   $('#tree').val([[${ministriesId}]]);
+	               }catch{
+	            	   console.log("不选中根节点");
+	               }
+	               treeSelect.refresh('tree');//刷新树结构
+	            }
+	        });
+			
+			form.verify({
+				  repeatCheck: function(value, item){ //value：表单的值、item：表单的DOM对象
+				    if($("[name='password']").val()!=value){
+				    	return "与新密码不一致";
+				    }
+				  },
+				  username: function(value, item){ //value：表单的值、item：表单的DOM对象
+					    if(!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)){
+					      return '用户名不能有特殊字符';
+					    }
+					    if(/(^\_)|(\__)|(\_+$)/.test(value)){
+					      return '用户名首尾不能出现下划线\'_\'';
+					    }
+					    if(/^\d+\d+\d$/.test(value)){
+					      return '用户名不能全为数字';
+					    }
+					  },
+					pass: [
+						    /^[\S]{6,12}$/
+						    ,'密码必须6到12位，且不能出现空格'
+						  ] 
+				});
+
+			form.on('submit(submitForm)', function(data) {
+				data.field.ministriesId=$('#tree').val();
+				$.ajax({
+							url : _ctx + '/manager-user',
+							type : 'post',
+							data : data.field,
+							success : function(result) {
+								if (result.SUCCESS) {
+									var index = parent.layer
+											.getFrameIndex(window.name);
+									parent.layer.close(index);
+									parent.layer.msg('创建成功');
+								} else {
+									layer.msg('创建失败');
+								}
+							}
+						});
+				return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+			});
+		});
+		/*]]>*/
+	</script>
+</body>
+</html>

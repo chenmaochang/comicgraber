@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>首页</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<script th:src="@{/layui/extends/treeTable.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+<style type="text/css">
+.title{
+       font-family:Arial,Helvetica,sans-serif;
+       font-size:1.25em;
+       vertical-align:middle;
+      }
+.button_tree{
+font-family:Arial,Helvetica,sans-serif;
+       font-size:1.25em;
+       vertical-align:middle;
+       color: #000080;
+}
+</style>
+</head>
+<body>
+<a class="layui-btn layui-btn-primary"  onclick="addMenu()">新增菜单</a>
+		<table class="layui-table layui-form" id="tree-table" lay-size="sm"></table>
+  <script type="text/javascript" th:inline="javascript">
+  /*<![CDATA[*/
+  layui.config({
+		base: _ctx+'/layui/extends/',
+	})
+	layui.use(['treeTable','layer','code','form'],function(){
+		var o = layui.$,
+			form = layui.form,
+			layer = layui.layer,
+			treeTable = layui.treeTable;
+		var	re = treeTable.render({
+			elem: '#tree-table',
+			primary_key: 'id',
+			parent_key: 'parentId',
+			data: [[${menus}]],
+			icon_key: 'name',
+			//is_checkbox: true,
+			end: function(e){
+				form.render();
+			},
+			cols: [
+				{
+					key: 'name',
+					title: '名称',
+					width: '20%',
+					template: function(item){
+						if(item.menuType=='BUTTON'){
+							return '<span class="button_tree">'+item.name+'</span>';
+						}else{
+							return '<span class="title">'+item.name+'</span>';
+						}
+						
+					}
+				},
+				{
+					key: 'menuType',
+					title: '菜单类型',
+					width: '20%',
+					align: 'center',
+					template: function(item){
+						if(item.menuType=='BUTTON'){
+							return '<span class="title">按钮</span>';
+						}else if(item.menuType=='IFRAME'){
+							return '<span class="title">功能菜单</span>';
+						}else if(item.menuType=='VOID'){
+							return '<span class="title">父菜单</span>';
+						}
+						
+					}
+				},
+				{
+					key: 'menuUrl',
+					title: '菜单地址',
+					width: '40%',
+					align: 'center',
+				},
+				{
+					title: '操作',
+					width: '18%',
+					align: 'center',
+					template: function(item){
+						var addSubMenuButton='';
+						if(item.parentId==0){//目前只支持2级菜单,前端框架完善后可开放多级菜单
+							addSubMenuButton='<a class="layui-btn layui-btn-sm  layui-btn-normal" title="添加子菜单" lay-filter="addSubMenu"><i class="layui-icon" >&#xe654;</i></a>'
+						}
+						return addSubMenuButton
+						+'<a class="layui-btn layui-btn-sm  layui-btn-normal" title="编辑" lay-filter="editMenu"><i class="layui-icon" >&#xe642;</i></a>'
+						+'<a class="layui-btn layui-btn-sm  layui-btn-danger"  title="删除" lay-filter="removeMenu"><i class="layui-icon" >&#xe640;</i></a>';
+					}
+				}
+			]
+		});
+		
+		// 监听自定义
+		treeTable.on('tree(add)',function(data){
+			layer.msg(JSON.stringify(data));
+		});
+		treeTable.on('tree(addSubMenu)',function(data){
+			layui.use('layer', function(){
+		    	  var layer = layui.layer;
+		    	  var index = layer.open({
+			    	  type: 2,
+			    	  title: "添加子菜单",
+			    	  content: _ctx+'/menu/menuEdit?parentId='+data.item.id,
+			    	  area: ['500px', '350px'],
+			    	  maxmin: false,
+			    	  end:function(){
+			    		  location.reload();
+			    	  }
+			    	});
+		    	  //layer.full(index);
+		    	});
+		});
+		treeTable.on('tree(editMenu)',function(data){
+			layui.use('layer', function(){
+		    	  var layer = layui.layer;
+		    	  var index = layer.open({
+			    	  type: 2,
+			    	  title: "添加子菜单",
+			    	  content: _ctx+'/menu/menuEdit?id='+data.item.id,
+			    	  area: ['500px', '400px'],
+			    	  maxmin: false,
+			    	  end:function(){
+			    	  }
+			    	});
+		    	  //layer.full(index);
+		    	});
+		});
+		treeTable.on('tree(removeMenu)',function(data){
+			layer.confirm("此操作会级联删除子菜单,确定删除菜单吗？", {icon: 3, title:'提示'},
+		            function(index){//确定回调
+		                $.ajax({
+		                	type:'delete',
+		                	url:_ctx+'/menu/'+data.item.id,
+		                	success:function(){
+		                		location.reload();
+		                	}
+		                });
+		                layer.close(index);
+		            },function (index) {//取消回调
+		               layer.close(index);
+		            }
+		        );
+		});
+	})
+	
+	function addMenu(){
+			layui.use('layer', function(){
+		    	  var layer = layui.layer;
+		    	  var index = layer.open({
+			    	  type: 2,
+			    	  title: "添加菜单",
+			    	  content: _ctx+'/menu/menuEdit',
+			    	  area: ['500px', '400px'],
+			    	  maxmin: false,
+			    	  end:function(){
+			    		  location.reload();
+			    	  }
+			    	});
+		    	  //layer.full(index);
+		    	});
+		}
+	/*]]>*/
+  </script>
+</body>
+</html>

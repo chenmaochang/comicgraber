@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>首页</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+<style type="text/css">
+iframe {
+	width: 100%;
+	height: 100%;
+}
+.layui-show {
+	width: 100%;
+	height: 100%;
+}
+</style>
+</head>
+<body>
+<body class="layui-layout-body">
+	<div class="layui-layout layui-layout-admin">
+		<div class="layui-header">
+			<div class="layui-logo">
+				<img src="http://t.cn/RCzsdCq" class="layui-nav-img">贵阳流动人口信息系统
+			</div>
+			<ul class="layui-nav layui-layout-right">
+				<li class="layui-nav-item" id="unread"></li>
+				<li class="layui-nav-item"><a href="javascript:;" onclick="openEditUserWindow()"><img src="http://t.cn/RCzsdCq" class="layui-nav-img" id="head-icon"><shiro:principal property="name"/></a>
+					<dl class="layui-nav-child">
+						<dd>
+							<a href='javascript:void(0)' onclick="openEditPasswordWindow()">修改密码</a>
+						</dd>
+						<dd>
+							<a href='javascript:void(0)' th:href="@{/web/logout}">退出登录</a>
+						</dd>
+					</dl></li>
+			</ul>
+		</div>
+		<div class="layui-side layui-bg-black">
+			<div class="layui-side-scroll">
+				<!-- 左侧导航区域 -->
+				<ul class="layui-nav layui-nav-tree" id="navtree" th:each="menu:${menus}">
+					<shiro:hasPermission name="${menu.name}">
+						<li class="layui-nav-item" th:if="${menu.menuType != 'BUTTON'}"><a href="javascript:;" th:onclick="openMenu([[${menu.name}]],[[${menu.menuUrl}]],[[${menu.menuType}]])">[[${menu.name}]]</a>
+							<dl class="layui-nav-child" th:each="child:${menu.children}">
+								<shiro:hasPermission name="${child.name}">
+									<dd th:if="${child.menuType != 'BUTTON'}">
+										<a href="javascript:;" th:onclick="openMenu([[${child.name}]],[[${child.menuUrl}]],[[${child.menuType}]])">[[${child.name}]]</a>
+									</dd>
+								</shiro:hasPermission>
+							</dl></li>
+					</shiro:hasPermission>
+				</ul>
+			</div>
+		</div>
+
+		<div class="layui-body">
+			<div class="layui-tab layui-tab-brief" lay-allowClose="true" lay-filter="navtab" style="height: 90%; margin-top: -2px;">
+				<ul class="layui-tab-title">
+					<li class="layui-this">主页</li>
+				</ul>
+				<div class="layui-tab-content" style="width: 100%; height: 100%">
+					<div class="layui-tab-item layui-show">
+						<iframe th:src="@{/menu/menuList}" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="layui-footer">Copyright © 2016 广东创能科技股份有限公司 粤ICP备14100627号-1</div>
+	</div>
+	<script type="text/javascript" th:inline="javascript">
+	/*<![CDATA[*/
+		var menus=[[${menus}]];
+		var element;
+		layui.use('element', function() {
+			element= layui.element;
+		});
+		//加载地址
+		function openMenu(name,frameUrl,menuType) {
+			element.tabDelete('navtab', name);
+			if(menuType=='IFRAME'){
+				element.tabAdd('navtab', {title: name,content: '<iframe src="'+_ctx+frameUrl+'" frameborder="no" border="0" marginwidth="0" marginheight="0"></iframe>',id: name});
+			}
+			element.tabChange('navtab', name);
+		}
+
+		function openEditPasswordWindow() {
+			layui.use('layer', function() {
+				var layer = layui.layer;
+				var index = layer.open({
+					type : 2,
+					title : "修改密码",
+					content : _ctx + '/manager-user/editPassword',
+					area : [ '450px', '300px' ],
+					maxmin : false,
+					end : function() {
+					}
+				});
+				//layer.full(index);
+			});
+		}
+		
+		function openEditUserWindow(){
+			layui.use('layer', function() {
+				var layer = layui.layer;
+				var index = layer.open({
+					type : 2,
+					title : "修改个人信息",
+					content : _ctx + '/manager-user/editUserInfo',
+					area : [ '450px', '380px' ],
+					maxmin : false,
+					end : function() {
+					}
+				});
+				//layer.full(index);
+			});
+		}
+		
+		heartbeatMsg();//首次请求
+		self.setInterval("heartbeatMsg()",15000);//15秒心跳
+		//心跳请求未读
+		function heartbeatMsg(){
+				/* $.ajax({
+					url:_ctx+"/message/nextUnRead",
+					type:"get",
+					success:function(result){
+						if(result.SUCCESS){
+							$("#unread").html('<a id="unread" href="javascript:;" onclick="openUnReadMessage('+result.id+')">未读消息<span class="layui-badge">'+result.size+'</span></a>');
+						}else{
+							$("#unread").html('<a id="unread" href="javascript:;" onclick="heartbeatMsg()">未读消息<span class="layui-badge layui-bg-gray">0</span></a>');
+						}
+					}
+				}); */
+		}
+		//打开未读消息
+		function openUnReadMessage(id){
+			layui.use('layer', function(){
+		    	  var layer = layui.layer;
+		    	  var index = layer.open({
+			    	  type: 2,
+			    	  title: "查看消息",
+			    	  content: _ctx+'/message/messageGet/'+id,
+			    	  area: ['550px', '400px'],
+			    	  maxmin: false,
+			    	  success:function(){
+			    		  heartbeatMsg();
+			    	  }
+			    	});
+		    	  //layer.full(index);
+		    	});
+		}
+		/*]]>*/
+	</script>
+</body>
+</html>

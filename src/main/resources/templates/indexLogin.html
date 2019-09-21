@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>首页</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/encript/md5.js}"></script>
+<link rel="stylesheet" th:href="@{/login/css/style.css}">
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+<script type="text/javascript">
+	if (window != top) {
+		top.location.href = location.href;
+	}
+</script>
+</head>
+<body>
+	<main th:style="'background:url(' + @{/images/index_background.jpg} + ');position: fixed;top: 0;left: 0;width: 100%;height: 100%;display: -webkit-box;display: -ms-flexbox;display: flex;-webkit-box-pack: center;-ms-flex-pack: center;justify-content: center;-webkit-box-align: center;-ms-flex-align: center;align-items: center;background-size: cover;'">
+	<form class="form">
+		<div class="form__cover"></div>
+		<div class="form__loader">
+			<div class="spinner active">
+				<svg class="spinner__circular" viewBox="25 25 50 50">
+          <circle class="spinner__path" cx="50" cy="50" r="20"
+						fill="none" stroke-width="4" stroke-miterlimit="10"></circle>
+        </svg>
+			</div>
+		</div>
+		<div class="form__content">
+			<h1>请登录</h1>
+			<div class="styled-input">
+				<input type="text" class="styled-input__input" name="name">
+				<div class="styled-input__placeholder">
+					<span class="styled-input__placeholder-text">用户名</span>
+				</div>
+				<div class="styled-input__circle"></div>
+			</div>
+			<div class="styled-input">
+				<input type="password" class="styled-input__input" name="password">
+				<div class="styled-input__placeholder">
+					<span class="styled-input__placeholder-text">密码</span>
+				</div>
+				<div class="styled-input__circle"></div>
+			</div>
+			<button type="button" class="styled-button" id="submitButton"
+				onclick="submitForm()">
+				<span class="styled-button__real-text-holder"> <span
+					class="styled-button__real-text">登录</span> <span
+					class="styled-button__moving-block face"> <span
+						class="styled-button__text-holder"> <span
+							class="styled-button__text">登录</span>
+					</span>
+				</span><span class="styled-button__moving-block back"> <span
+						class="styled-button__text-holder"> <span
+							class="styled-button__text">登录</span>
+					</span>
+				</span>
+				</span>
+			</button>
+		</div>
+	</form>
+	</main>
+
+	<script th:src="@{/login/js/index.js}"></script>
+	<script type="text/javascript">
+		function submitForm() {
+			$.ajax({
+				type : "post",
+				url : _ctx + '/web/login',
+				data : {
+					"username" : $("[name='name']").val(),
+					"password" : hex_md5($("[name='password']").val()),
+					"rememberMe" : true
+				},
+				success : function(result) {
+					if (result.success) {
+						location.href = _ctx + '/web/home'
+					} else {
+						layui.use('layer', function() {
+							var layer = layui.layer;
+							layer.msg("登录失败");
+						});
+					}
+				}
+			});
+		}
+		
+		$(document).keydown(function (e) {
+            if (e.keyCode === 13) {
+            	submitForm();
+                }
+        });
+	</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cmc.comicgrab.mapper.MinistriesMapper">
+	<resultMap id="baseResult" type="org.cmc.comicgrab.entity.Ministries">
+		<id column="id_" jdbcType="INTEGER" property="id" />
+		<result column="name_" jdbcType="VARCHAR" property="name" />
+		<result column="parent_id_" jdbcType="INTEGER" property="parentId" />
+		<result column="path_" jdbcType="VARCHAR" property="path" />
+		<result column="area_code_" jdbcType="INTEGER" property="areaCode" />
+		<result column="area_type_" jdbcType="INTEGER" property="areaType" />
+		<result column="address_detail_" jdbcType="VARCHAR" property="addressDetail" />
+		<result column="work_unit_" jdbcType="VARCHAR" property="workUnit" />
+		<result column="type_" jdbcType="VARCHAR" property="type" />
+		<result column="sys_status_" jdbcType="VARCHAR" property="sysStatus" />
+		<result column="create_time_" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="update_time_" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="create_id_" jdbcType="INTEGER" property="createId" />
+		<collection column="id_" property="children" ofType="org.cmc.comicgrab.entity.Ministries" javaType="java.util.ArrayList" select="getMinistriesTree"></collection>
+	</resultMap>
+	<select id="getMinistriesTree" resultMap="baseResult" parameterType="int">
+		select
+		id_,name_,parent_id_,path_,area_code_,area_type_,address_detail_,work_unit_,type_,sys_status_,create_time_,update_time_,create_id_
+		from ministries_
+		where
+		parent_id_=#{parentId} and sys_status_='Y'
+	</select>
+	<select id="getMinistriesByUserId" resultMap="baseResult" parameterType="int">
+		select m.id_,m.name_,m.parent_id_,m.path_,m.area_code_,m.area_type_,m.address_detail_,m.work_unit_,m.type_,m.sys_status_,m.create_time_,m.update_time_,m.create_id_ from ministries_  m
+		inner JOIN user_ministries_ um on um.ministries_id_ = m.id_
+		where um.user_id_ = #{userId}
+	</select>
+
+</mapper>

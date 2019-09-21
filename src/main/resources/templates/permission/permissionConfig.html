@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>首页</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+	<hr class="layui-bg-blue">
+	<div align="center">
+	<div id="permissionTransfer"></div>
+	</div>
+    <div  align="center" style="margin-top: 1.3em;">
+      <button class="layui-btn" onclick="submitConfiguration()">保存配置</button>
+    </div>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		var globalAllData=[];
+		var globalRightData=[];
+		
+		buildTransferData([[${menus}]],[[${rolePermissionRelations}]]);	
+		
+		var transfer;
+		layui.use('transfer', function() {
+			transfer = layui.transfer;
+			transfer.render({
+				elem : '#permissionTransfer', //绑定元素
+				title: ['未选菜单', '已选菜单'] ,  //自定义标题
+				data : globalAllData,
+				value : globalRightData,
+				id : 'permissionTransfer' //定义索引
+			});
+		});
+		
+		//构建备选穿梭框
+		function buildTransferData(allData,rightData){
+			for(var i=0;i<allData.length;i++){
+				var obj={};
+				obj.value=allData[i].id;
+				obj.title=allData[i].name;
+				obj.menuUrl=allData[i].menuUrl;
+				globalAllData.push(obj);
+			}
+			for(var j=0;j<rightData.length;j++){
+				globalRightData.push(rightData[j].menuId)
+			}
+		}
+		
+		
+		function submitConfiguration(){
+			var getData = transfer.getData('permissionTransfer'); 
+			$.ajax({
+				url : _ctx + '/role-permission-relation',
+				type : 'post',
+				data : {menuIds:JSON.stringify(getData),roleId:[[${roleId}]]},
+				success : function(result) {
+					if (result.SUCCESS) {
+						var index = parent.layer.getFrameIndex(window.name);
+						parent.layer.close(index);
+						parent.layer.msg('保存成功');
+						parent.location.reload();
+					} else {
+						layer.msg('保存失败');
+					}
+				}
+			});
+		}
+		/*]]>*/
+	</script>
+</body>
+</html>

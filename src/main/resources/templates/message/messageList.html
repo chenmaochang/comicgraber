@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>角色管理</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body >
+	<div style="display: inline-block; ">
+		<label class="layui-form-label">消息标题</label>
+		<div class="layui-input-inline" style="width: 150px;">
+			<input id="name" placeholder="请输入消息标题" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<div class="layui-input-inline">
+			<a class="layui-btn layui-btn-normal" onclick="searchGrid()"> 搜索</a>
+		</div>
+	</div>
+	<a class="layui-btn layui-btn-primary"  onclick="add()">写消息</a>
+	<div style="height: 80%">
+	<table class="layui-hide" id="idTest" lay-filter="idTest"></table>
+	</div>
+	<script type="text/html" id="barDemo">
+<a class="layui-btn layui-btn-sm " lay-event="get" title="查看"><i class="layui-icon" >&#xe63c;</i></a>
+ {{#  if(d.sendStatus=="DRAFT"){ }}
+<a class="layui-btn layui-btn-sm  layui-btn-normal" lay-event="edit" title="继续编辑"><i class="layui-icon" >&#xe642;</i></a>
+  {{#  } }}
+{{#  if(d.readStatus=="N"){ }}
+<a class="layui-btn layui-btn-sm  layui-btn-danger" lay-event="remove" title="删除"><i class="layui-icon" >&#xe640;</i></a>
+{{#  } }}
+	</script>
+		<script th:inline="javascript">
+		layui.use('element', function(){
+			  var element = layui.element;
+			});
+			var table;
+			layui.use('table', function() {
+				table = layui.table;
+				table.render({
+					elem : '#idTest',
+					height : 'full',
+					url : _ctx+'/message/list',
+					id : 'idTest',
+					method : "post",
+					loading: true,
+					limits:[10],
+					size: 'lg',
+					cols : [ 
+					         [
+					{type:'checkbox'} ,
+					{field : 'title',width : "20%",title : '消息标题' },
+					{field : 'receiverName',width : "15%",title : '收信人' },
+					{field : 'createName',width : "15%",title : '发信人' },
+					{field : 'readStatus',width : "10%",title : '阅读状态' ,templet:function(d){if(d.readStatus=="Y"){return "已读"}else{return "未读"}}},
+					{field : 'createTime',width : "20%",title : '创建时间' },
+					{fixed: 'right',title:'操作栏',width : "17%", align:'center', toolbar: '#barDemo',style:'background-color: #F5FFFA; color: #fff;'}
+					] 
+					         ],
+					page : true
+				});
+				  //监听工具条
+				  table.on('tool(idTest)', function(obj){
+				    var data = obj.data;
+				    if(obj.event === 'edit'){
+				    	edit(data);//明细
+				    }else if(obj.event=== 'remove'){
+				    	remove(data);//编辑
+				    }else if(obj.event=== 'get'){
+				    	get(data);//编辑
+				    }
+				  });
+				  
+			});
+	    
+	    	//编写消息
+			function add(){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "编写消息",
+				    	  content: _ctx+'/message/messageEdit/0',
+				    	  area: ['600px', '350px'],
+				    	  maxmin: false,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+			
+			
+			//
+		    function remove(obj) {
+		        layer.confirm("确定删除消息吗？", {icon: 3, title:'提示'},
+		            function(index){//确定回调
+		                $.ajax({
+		                	type:'delete',
+		                	url:_ctx+'/message/'+obj.id,
+		                	success:function(result){
+		                		if(result.SUCCESS){
+		                			layer.msg('删除成功');
+		                			$(".layui-laypage-btn")[0].click();
+		                		}else{
+		                			layer.msg('删除失败:'+result.MESSAGE);
+		                		}
+		                	}
+		                });
+		                layer.close(index);
+		            },function (index) {//取消回调
+		               layer.close(index);
+		            }
+		        );
+		    }
+			
+			function edit(obj){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "编写消息",
+				    	  content: _ctx+'/message/messageEdit/'+obj.id,
+				    	  area: ['600px', '350px'],
+				    	  maxmin: false,
+				    	  end:function(){
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+			
+			function get(obj){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "查看消息",
+				    	  content: _ctx+'/message/messageGet/'+obj.id,
+				    	  area: ['600px', '400px'],
+				    	  maxmin: false,
+				    	  end:function(){
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+ 			
+			//搜索
+			function searchGrid() {
+				var searchData={};
+				 	searchData.title=$('#title').val();
+				table.reload('idTest', {
+					where : searchData,
+					page : {
+						curr : 1//重新从第 1 页开始
+					}
+				});
+			}
+			
+		</script>
+</body>
+</html>

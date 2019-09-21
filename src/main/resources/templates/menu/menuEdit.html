@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>首页</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+	<hr class="layui-bg-blue">
+	<form class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">父菜单</label>
+			<div class="layui-input-block" style="width: 50%">
+				<input type="hidden" name="id" th:value="${menu.id}" class="layui-input">
+				<input type="text" id="tree" lay-filter="tree" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">菜单名</label>
+			<div class="layui-input-block" style="width: 50%">
+				<input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="请输入菜单名" class="layui-input" th:value="${menu.name}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">菜单类型</label>
+			<div class="layui-input-block" style="width: 50%">
+				<input type="radio" name="menuType" value="IFRAME" title="弹窗" th:checked="${menu.menuType =='IFRAME' || menu.menuType == null}"> 
+				<input type="radio" name="menuType" value="VOID" title="无" th:checked="${menu.menuType =='VOID'}">
+				<input type="radio" name="menuType" value="BUTTON" title="按钮" th:checked="${menu.menuType =='BUTTON'}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">url</label>
+			<div class="layui-input-block" style="width: 60%">
+				<input type="text" id="menuUrl" name="menuUrl" lay-verify="required" autocomplete="off" placeholder="请再输入菜单url,如/menu/menuList" class="layui-input" th:value="${menu.menuUrl}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit="" lay-filter="submitForm">提交修改</button>
+				<button type="reset" class="layui-btn layui-btn-primary">重新输入</button>
+			</div>
+		</div>
+	</form>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		layui.config({
+			base:_ctx+'/layui/extends/',
+		}).extend({
+			treeSelect : 'treeSelect'
+		});
+		
+		
+		 layui.use(['treeSelect', 'form', 'layer'], function () {
+		        var treeSelect= layui.treeSelect,
+		            form = layui.form,
+		            $ = layui.jquery,
+		            layer = layui.layer;
+
+		        treeSelect.render({
+		            elem: '#tree',
+		            data: _ctx+'/menu/getMyMenus',
+		            headers: {},
+		            type: 'post',
+		            // 占位符
+		            placeholder: '目前为根节点',
+		            style: {
+		                folder: {
+		                    enable: true
+		                },
+		                line: {
+		                    enable: true
+		                }
+		            },
+		            click: function(d){
+		                $('#tree').val(d.current.id);
+		            },
+		            // 加载完成后的回调函数
+		            success: function (d) {
+		               try{
+		            	   treeSelect.checkNode('tree', [[${menu.parentId}]]);//选中节点，根据id筛选
+		            	   $('#tree').val([[${menu.parentId}]]);
+		               }catch{
+		            	   console.log("不选中根节点");
+		               }
+		               treeSelect.refresh('tree');//刷新树结构
+		            }
+		        });
+		        
+		        
+		        form.on('submit(submitForm)', function(data) {
+		        	data.field.parentId=$('#tree').val();
+					$.ajax({
+								url : _ctx + '/menu',
+								type : 'post',
+								data : data.field,
+								success : function(result) {
+									if (result.SUCCESS) {
+										var index = parent.layer.getFrameIndex(window.name);
+										parent.layer.close(index);
+										parent.layer.msg('保存成功');
+									} else {
+										layer.msg('保存失败');
+									}
+								}
+							});
+					return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+				});
+		    });
+		
+		
+		
+		
+		/*]]>*/
+	</script>
+</body>
+</html>

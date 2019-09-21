@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>首页</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body>
+	<hr class="layui-bg-blue">
+	<form class="layui-form">
+		<div class="layui-form-item">
+			<label class="layui-form-label">父部门</label>
+			<div class="layui-input-block" style="width: 50%">
+				<input type="text" id="tree" lay-filter="tree" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">部门名</label>
+			<div class="layui-input-block" style="overflow:hidden">
+				<div  style="width: 40%;float:left"><input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="请输入部门名" class="layui-input" th:value="${ministries.name}" ></div>
+				<div style="width: 40%;float:left;margin-left: 1em;"><input type="checkbox" name="ruleTogethere" lay-skin="primary" title="共同管理"  value="true" th:checked="${ruleTogethere == true}"></div>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">用工单位</label>
+			<div class="layui-input-block" style="width: 50%">
+				<input type="radio" name="workUnit" value="Y" title="是" th:checked="${ministries.workUnit =='Y'}"> 
+				<input type="radio" name="workUnit" value="N" title="否" th:checked="${ministries.workUnit !='Y'}">
+				<input type="hidden" name="id"  class="layui-input" th:value="${ministries.id}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">类别</label>
+			<div class="layui-input-block" style="width: 60%">
+				<input type="radio" name="type" value="其他" title="其他" th:checked="${ministries.type =='其他' || ministries.type==null}">
+				<input type="radio" name="type" value="国企" title="国企" th:checked="${ministries.type =='国企'}">
+				<input type="radio" name="type" value="私企" title="私企" th:checked="${ministries.type =='私企'}">
+				<input type="radio" name="type" value="合资" title="合资" th:checked="${ministries.type =='合资'}">
+				<input type="radio" name="type" value="机关事业单位" title="机关事业单位" th:checked="${ministries.type =='机关事业单位'}">
+				<input type="radio" name="type" value="学校" title="学校" th:checked="${ministries.type =='学校'}">
+				<input type="radio" name="type" value="医疗机构" title="医疗机构" th:checked="${ministries.type =='医疗机构'}">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">备注</label>
+			<div class="layui-input-block" style="width: 60%">
+				<textarea name="remarks"   placeholder="请输入备注" class="layui-textarea">[[${ministries.remarks}]]</textarea>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit="" lay-filter="submitForm">提交修改</button>
+				<button type="reset" class="layui-btn layui-btn-primary">重新输入</button>
+			</div>
+		</div>
+	</form>
+	<script type="text/javascript" th:inline="javascript">
+		/*<![CDATA[*/
+		layui.config({
+			base:_ctx+'/layui/extends/',
+		}).extend({
+			treeSelect : 'treeSelect'
+		});
+		
+		
+		 layui.use(['treeSelect', 'form', 'layer'], function () {
+		        var treeSelect= layui.treeSelect,
+		            form = layui.form,
+		            $ = layui.jquery,
+		            layer = layui.layer;
+
+		        treeSelect.render({
+		            elem: '#tree',
+		            data: _ctx+'/ministries/tree/',
+		            headers: {},
+		            type: 'post',
+		            // 占位符
+		            placeholder: '目前为根节点',
+		            style: {
+		                folder: {
+		                    enable: true
+		                },
+		                line: {
+		                    enable: true
+		                }
+		            },
+		            click: function(d){
+		                $('#tree').val(d.current.id);
+		            },
+		            // 加载完成后的回调函数
+		            success: function (d) {
+		               try{
+		            	   treeSelect.checkNode('tree', [[${ministries.parentId}]]);//选中节点，根据id筛选
+		            	   $('#tree').val([[${ministries.parentId}]]);
+		               }catch{
+		            	   console.log("不选中根节点");
+		               }
+		               treeSelect.refresh('tree');//刷新树结构
+		            }
+		        });
+		        
+		        
+		        form.on('submit(submitForm)', function(data) {
+		        	data.field.parentId=$('#tree').val();
+					$.ajax({
+								url : _ctx + '/ministries',
+								type : 'post',
+								data : data.field,
+								success : function(result) {
+									if (result.SUCCESS) {
+										var index = parent.layer.getFrameIndex(window.name);
+										parent.layer.close(index);
+										parent.layer.msg('保存成功');
+									} else {
+										layer.msg('保存失败');
+									}
+								}
+							});
+					return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+				});
+		    });
+		
+		
+		
+		
+		/*]]>*/
+	</script>
+</body>
+</html>

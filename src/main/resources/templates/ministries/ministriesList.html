@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://org.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="_ctx" th:content="@{/}" />
+<title>角色管理</title>
+<script th:src="@{/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/share.js}"></script>
+<script th:src="@{/layui/layui.js}"></script>
+<link rel="stylesheet" th:href="@{/layui/css/layui.css}" media="all">
+</head>
+<body >
+	<div style="display: inline-block; ">
+		<label class="layui-form-label">部门名称</label>
+		<div class="layui-input-inline" style="width: 150px;">
+			<input id="name" placeholder="请输入部门名称" autocomplete="off"
+				class="layui-input">
+		</div>
+	</div>
+	<div style="display: inline-block;">
+		<div class="layui-input-inline">
+			<a class="layui-btn layui-btn-normal" onclick="searchGrid()"> 搜索
+			</a>
+		</div>
+	</div>
+	<a class="layui-btn layui-btn-primary"  onclick="add()">新增</a>
+	<div style="height: 80%">
+	<table class="layui-hide" id="idTest" lay-filter="idTest"></table>
+	</div>
+	<script type="text/html" id="barDemo">
+<a class="layui-btn layui-btn-sm  layui-btn-normal" lay-event="roleMinistries" title="分配角色"><i class="layui-icon" >&#xe60a;</i></a>
+<a class="layui-btn layui-btn-sm  layui-btn-normal" lay-event="edit" title="编辑"><i class="layui-icon" >&#xe642;</i></a>
+<a class="layui-btn layui-btn-sm  layui-btn-danger" lay-event="remove" title="删除"><i class="layui-icon" >&#xe640;</i></a>
+	</script>
+		<script th:inline="javascript">
+		/*<![CDATA[*/
+		layui.use('element', function(){
+			  var element = layui.element;
+			});
+			var table;
+			layui.use('table', function() {
+				table = layui.table;
+				table.render({
+					elem : '#idTest',
+					height : 'full',
+					url : _ctx+'/ministries/list',
+					id : 'idTest',
+					method : "post",
+					loading: true,
+					limits:[10],
+					size: 'lg',
+					cols : [ 
+					         [
+					{type:'checkbox'} ,
+					{field : 'name',width : "20%",title : '部门名称' },
+					{field : 'createTime',width : "40%",title : '创建时间' ,templet:function(d){return dateFormat(d.createTime, 'Y-m-d H:i:s')}},
+					{fixed: 'right',title:'操作栏',width : "37%", align:'center', toolbar: '#barDemo',style:'background-color: #F5FFFA; color: #fff;'}
+					] 
+					         ],
+					page : true
+				});
+				  //监听工具条
+				  table.on('tool(idTest)', function(obj){
+				    var data = obj.data;
+				    if(obj.event === 'roleMinistries'){
+				    	roleMinistries(data);//明细
+				    }else if(obj.event=== 'remove'){
+				    	remove(data);//编辑
+				    }else if(obj.event=== 'edit'){
+				    	edit(data);//编辑
+				    }
+				  });
+				  
+			});
+	    
+	    	//添加部门
+			function add(){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "添加部门",
+				    	  content: _ctx+'/ministries/ministriesEdit',
+				    	  area: ['700px', '500px'],
+				    	  maxmin: false,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+	    	
+			//添加部门
+			function edit(obj){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "编辑部门",
+				    	  content: _ctx+'/ministries/ministriesEdit?id='+obj.id,
+				    	  area: ['700px', '500px'],
+				    	  maxmin: false,
+				    	  end:function(){
+				    		  $(".layui-laypage-btn")[0].click();
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+			
+			
+			//逻辑级联删除部门,物理删除关联的角色关系
+		    function remove(obj) {
+		        layer.confirm("确定删除部门吗？", {icon: 3, title:'提示'},
+		            function(index){//确定回调
+		                $.ajax({
+		                	type:'delete',
+		                	url:_ctx+'/ministries/'+obj.id,
+		                	success:function(result){
+		                		if(result.SUCCESS){
+		                			layer.msg('删除成功');
+		                			$(".layui-laypage-btn")[0].click();
+		                		}else{
+		                			layer.msg('删除失败:'+result.MESSAGE);
+		                		}
+		                	}
+		                });
+		                layer.close(index);
+		            },function (index) {//取消回调
+		               layer.close(index);
+		            }
+		        );
+		    }
+			
+			function roleMinistries(obj){
+				layui.use('layer', function(){
+			    	  var layer = layui.layer;
+			    	  var index = layer.open({
+				    	  type: 2,
+				    	  title: "权限配置",
+				    	  content: _ctx+'/ministries/roleConfig/'+obj.id,
+				    	  area: ['500px', '500px'],
+				    	  maxmin: false,
+				    	  end:function(){
+				    	  }
+				    	});
+			    	  //layer.full(index);
+			    	});
+			}
+ 			
+			//搜索
+			function searchGrid() {
+				var searchData={};
+				 	searchData.name=$('#name').val();
+				table.reload('idTest', {
+					where : searchData,
+					page : {
+						curr : 1//重新从第 1 页开始
+					}
+				});
+			}
+			/*]]>*/
+		</script>
+</body>
+</html>
