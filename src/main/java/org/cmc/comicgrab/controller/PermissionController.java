@@ -37,6 +37,7 @@ public class PermissionController {
 	@GetMapping("permissionConfig/{roleId}")
 	public ModelAndView permissionConfig(@PathVariable("roleId")Integer roleId) {
 		ModelAndView modelAndView=new ModelAndView(MODUAL+"permissionConfig");
+		
 		QueryWrapper<RolePermissionRelation> rolePermissionRelationQueryWrapper=new QueryWrapper<>();
 		rolePermissionRelationQueryWrapper.eq("role_id_", roleId).eq("sys_status_", 1);
 		List<RolePermissionRelation> rolePermissionRelations=rolePermissionRelationService.list(rolePermissionRelationQueryWrapper);

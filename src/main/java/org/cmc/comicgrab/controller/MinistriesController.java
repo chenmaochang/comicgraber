@@ -91,6 +91,7 @@ public class MinistriesController {
 	public LayuiPageResult<Ministries> list(@ModelAttribute("page") LayuiPage layuiPage, @ModelAttribute("ministries") Ministries ministries) {
 		ManagerUser user = (ManagerUser) SecurityUtils.getSubject().getPrincipal();
 		Ministries ministry = ministriesService.getMinistriesByUserId(user.getId());
+		
 		QueryWrapper<Ministries> queryWrapper = new QueryWrapper<>();
 		if (StringUtils.isNotBlank(ministries.getName())) {
 			queryWrapper.eq("name_", ministries.getName());

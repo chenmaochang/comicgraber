@@ -66,10 +66,8 @@ public class MessageController {
 	public LayuiPageResult<Message> list(@ModelAttribute("page") LayuiPage layuiPage, @ModelAttribute("message") Message message) {
 		ManagerUser user=(ManagerUser) SecurityUtils.getSubject().getPrincipal();
 		QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
-		if (StringUtils.isNotBlank(message.getTitle())) {
-			queryWrapper.likeLeft("title_", message.getTitle());
-		}
-		queryWrapper.eq("sys_status_", Constants.SystemConstants.NORMAL.getValue())
+		queryWrapper.likeLeft(StringUtils.isNotBlank(message.getTitle()),"title_", message.getTitle())
+		.eq("sys_status_", Constants.SystemConstants.NORMAL.getValue())
 		.eq("create_id_", user.getId())
 		.or()
 		.eq("receiver_id_", user.getId())
@@ -84,8 +82,7 @@ public class MessageController {
 		ManagerUser user = (ManagerUser) SecurityUtils.getSubject().getPrincipal();
 		try {
 			ManagerUser receiver = managerUserService.getById(message.getReceiverId());
-			message.setCreateId(user.getId()).setReceiverName(receiver.getName());
-			message.setCreateName(user.getName());
+			message.setCreateId(user.getId()).setReceiverName(receiver.getName()).setCreateName(user.getName());
 			messageService.saveOrUpdate(message);
 			rtnObj.put(Constants.SystemConstants.SUCCESS.getValue(), true);
 		} catch (Exception e) {
@@ -113,9 +110,9 @@ public class MessageController {
 		JSONObject rtnObj=new JSONObject();
 		ManagerUser user = (ManagerUser) SecurityUtils.getSubject().getPrincipal();
 		QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("receiver_id_", user.getId());
-		queryWrapper.eq("sys_status_", Constants.SystemConstants.NORMAL.getValue());
-		queryWrapper.eq("read_status_", Constants.SystemConstants.FORBIDDEN.getValue());
+		queryWrapper.eq("receiver_id_", user.getId())
+		.eq("sys_status_", Constants.SystemConstants.NORMAL.getValue())
+		.eq("read_status_", Constants.SystemConstants.FORBIDDEN.getValue());
 		List<Message> list = messageService.list(queryWrapper);
 		Integer size=list.size();
 		rtnObj.put(Constants.SystemConstants.SUCCESS.getValue(), size>0);

@@ -205,20 +205,14 @@ public class ManagerUserController {
 	public LayuiPageResult<ManagerUser> list(@ModelAttribute("page") LayuiPage layuiPage, @ModelAttribute("user") ManagerUser managerUser,@RequestParam(name="ministriesId",required=false)Integer ministriesId) {
 		ManagerUser user=(ManagerUser) SecurityUtils.getSubject().getPrincipal();
 		Ministries mainMinistry=ministriesService.getMinistriesByUserId(user.getId());
+		
 		QueryWrapper<ManagerUser> queryWrapper=new QueryWrapper<>();
-		if(StringUtils.isNotBlank(managerUser.getName())) {
-			queryWrapper.likeLeft("name_", managerUser.getName());
-		}
-		if(StringUtils.isNotBlank(managerUser.getAccount())) {
-			queryWrapper.likeLeft("account_", managerUser.getAccount());
-		}
-		if(ministriesId!=null) {
-			queryWrapper.inSql("id_", "select user_id_ from user_ministries_ where ministries_id_ ="+ministriesId);
-		}
-		if(!mainMinistry.getName().equals("管理中心")) {//如果不是管理中心的话只能看自己以及子部门的员工
-			queryWrapper.inSql("id_", "select user_id_ from user_ministries_ where ministries_id_ in (SELECT id_ FROM ministries_ WHERE path_ LIKE '"+mainMinistry.getPath()+"%')");
-		}
-		queryWrapper.eq("sys_status_", Constants.SystemConstants.NORMAL.getValue());
+		queryWrapper.likeLeft(StringUtils.isNotBlank(managerUser.getName()),"name_", managerUser.getName())
+		.likeLeft(StringUtils.isNotBlank(managerUser.getAccount()),"account_", managerUser.getAccount())
+		.inSql(ministriesId!=null,"id_", "select user_id_ from user_ministries_ where ministries_id_ ="+ministriesId)
+		.inSql(!mainMinistry.getName().equals("管理中心"),"id_", "select user_id_ from user_ministries_ where ministries_id_ in (SELECT id_ FROM ministries_ WHERE path_ LIKE '"+mainMinistry.getPath()+"%')")//如果不是管理中心的话只能看自己以及子部门的员工
+		.eq("sys_status_", Constants.SystemConstants.NORMAL.getValue());
+		
 		Page<ManagerUser> page = new Page<>(layuiPage.getPage(), layuiPage.getLimit());
 		LayuiPageResult<ManagerUser> result = new LayuiPageResult<>(managerUserService.page(page, queryWrapper));
 		return result;

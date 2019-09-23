@@ -46,9 +46,7 @@ public class RoleController {
 	@PostMapping("list")
 	public LayuiPageResult<Role> list(@ModelAttribute("page")LayuiPage layuiPage,@ModelAttribute("role")Role role) {
 		QueryWrapper<Role> queryWrapper=new QueryWrapper<>();
-		if(StringUtils.isNotBlank(role.getRoleName())) {
-			queryWrapper.eq("role_name_", role.getRoleName());
-		}
+		queryWrapper.eq(StringUtils.isNotBlank(role.getRoleName()),"role_name_", role.getRoleName());
 		Page<Role> page = new Page<>(layuiPage.getPage(), layuiPage.getLimit());
 		return new LayuiPageResult<>(roleService.page(page, queryWrapper));
 	}

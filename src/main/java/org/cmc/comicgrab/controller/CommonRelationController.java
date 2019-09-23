@@ -75,10 +75,10 @@ public class CommonRelationController {
 		ManagerUser user=(ManagerUser) SecurityUtils.getSubject().getPrincipal();;
 		ministriesArrays.forEach(commonRelationObj -> {
 			CommonRelation commonRelation = new CommonRelation();
-			commonRelation.setMasterId(((JSONObject) commonRelationObj).getInteger("value"));
-			commonRelation.setSlaveId(userId);
-			commonRelation.setRelationType(Constants.RelationType.VICE_MINISTRIES.getValue());
-			commonRelation.setCreateId(user.getId());
+			commonRelation.setMasterId(((JSONObject) commonRelationObj).getInteger("value"))
+			.setSlaveId(userId)
+			.setRelationType(Constants.RelationType.VICE_MINISTRIES.getValue())
+			.setCreateId(user.getId());
 			commonRelations.add(commonRelation);
 		});
 	}
