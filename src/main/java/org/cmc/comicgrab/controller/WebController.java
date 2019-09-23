@@ -70,7 +70,6 @@ public class WebController {
 	@PostMapping("login")
     public JSONObject login(String username, String password,@RequestParam(value="rememberMe",required=false)Boolean rememberMe) {
     	JSONObject rtnObj=new JSONObject();
-        // 从SecurityUtils里边创建一个 subject
         Subject subject = SecurityUtils.getSubject();
         // 在认证提交前准备 token（令牌）
         UsernamePasswordToken token = new UsernamePasswordToken(username, password,rememberMe);
