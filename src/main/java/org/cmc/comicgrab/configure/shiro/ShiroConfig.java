@@ -50,6 +50,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/layui/**", "anon");
 		filterChainDefinitionMap.put("/login/**", "anon");
 		filterChainDefinitionMap.put("/web/logout", "logout");
+		filterChainDefinitionMap.put("/anno/**", "anon");//游客访问
 		// 主要这行代码必须放在所有权限设置的最后，不然会导致所有 url 都被拦截
 		filterChainDefinitionMap.put("/**", "user");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
