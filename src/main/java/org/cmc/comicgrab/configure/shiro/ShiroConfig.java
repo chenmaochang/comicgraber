@@ -3,6 +3,7 @@ package org.cmc.comicgrab.configure.shiro;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.Filter;
 
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
@@ -25,6 +26,8 @@ public class ShiroConfig {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new RestShiroFilterFactoryBean();
 		// 必须设置 SecurityManager
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
+		Map<String, Filter> filters = shiroFilterFactoryBean.getFilters();
+	    filters.put("perms", new RestAuthorizationFilter());//设置自定义的restFilter来代替原本的permsFilter
 		// setLoginUrl 如果不设置值，默认会自动寻找Web工程根目录下的"/login.jsp"页面 或 "/login" 映射
 		shiroFilterFactoryBean.setLoginUrl("/");
 		shiroFilterFactoryBean.setSuccessUrl("/web/home");
@@ -36,7 +39,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/web/login", "anon");
 		
 		//filterChainDefinitionMap.put("/manager-user/changePassword", "roles[admin]");//test
-		//filterChainDefinitionMap.put("/manager-user/password", "perms[角色管理]");//test
+		//filterChainDefinitionMap.put("/permission/permissionConfig/1", "perms[角色:权限配置]");//test
 		// 其余接口一律拦截
 		// filterChainDefinitionMap.put("/**", "authc");
 		filterChainDefinitionMap.put("/api/**", "anon");
@@ -47,8 +50,6 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/layui/**", "anon");
 		filterChainDefinitionMap.put("/login/**", "anon");
 		filterChainDefinitionMap.put("/web/logout", "logout");
-		//匿名访问权限
-		filterChainDefinitionMap.put("/anno/**", "anon");
 		// 主要这行代码必须放在所有权限设置的最后，不然会导致所有 url 都被拦截
 		filterChainDefinitionMap.put("/**", "user");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);

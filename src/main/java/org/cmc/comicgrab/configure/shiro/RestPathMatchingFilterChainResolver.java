@@ -1,7 +1,5 @@
 package org.cmc.comicgrab.configure.shiro;
 
-import java.util.Iterator;
-
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletRequest;
@@ -16,59 +14,40 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RestPathMatchingFilterChainResolver extends PathMatchingFilterChainResolver {
 
-    public RestPathMatchingFilterChainResolver() {
-        super();
-    }
+	public RestPathMatchingFilterChainResolver() {
+		super();
+	}
 
-    public RestPathMatchingFilterChainResolver(FilterConfig filterConfig) {
-        super(filterConfig);
-    }
-    /* *
-     * @Description 重写filterChain匹配
-     * @Param [request, response, originalChain]
-     * @Return javax.servlet.FilterChain
-     */
-    @Override
-    public FilterChain getChain(ServletRequest request, ServletResponse response, FilterChain originalChain) {
-        FilterChainManager filterChainManager = this.getFilterChainManager();
-        if (!filterChainManager.hasChains()) {
-            return null;
-        } else {
-            String requestURI = this.getPathWithinApplication(request);
-            Iterator var6 = filterChainManager.getChainNames().iterator();
+	public RestPathMatchingFilterChainResolver(FilterConfig filterConfig) {
+		super(filterConfig);
+	}
 
-            String pathPattern;
-            boolean flag = true;
-            String[] strings = null;
-            do {
-                if (!var6.hasNext()) {
-                    return null;
-                }
-
-                pathPattern = (String)var6.next();
-                strings = pathPattern.split("==");
-                if (strings.length == 2) {
-                    // 分割出url+httpMethod,判断httpMethod和request请求的method是否一致,不一致直接false
-                    if (WebUtils.toHttp(request).getMethod().toUpperCase().equals(strings[1].toUpperCase())) {
-                        flag = false;
-                    } else {
-                        flag = true;
-                    }
-                } else {
-                    flag = false;
-                }
-                pathPattern = strings[0];
-            } while(!this.pathMatches(pathPattern, requestURI) || flag);
-
-            if (log.isTraceEnabled()) {
-                log.trace("Matched path pattern [" + pathPattern + "] for requestURI [" + requestURI + "].  Utilizing corresponding filter chain...");
-            }
-            if (strings.length == 2) {
-                pathPattern = pathPattern.concat("==").concat(WebUtils.toHttp(request).getMethod().toUpperCase());
-            }
-            log.info("pathparttern:---"+pathPattern);
-            return filterChainManager.proxy(originalChain, pathPattern);
-        }
-    }
+	/*
+	 * *
+	 * @Description 重写filterChain匹配
+	 * @Param [request, response, originalChain]
+	 * @Return javax.servlet.FilterChain
+	 */
+	@Override
+	public FilterChain getChain(ServletRequest request, ServletResponse response, FilterChain originalChain) {
+		FilterChainManager filterChainManager = this.getFilterChainManager();
+		if (!filterChainManager.hasChains()) {
+			return null;
+		}
+		String requestURI = this.getPathWithinApplication(request);
+		for (String pathPattern : filterChainManager.getChainNames()) {
+			String[] urlArray = pathPattern.split("==");
+			if (urlArray.length >= 2 && WebUtils.toHttp(request).getMethod().toUpperCase().equals(urlArray[1].toUpperCase())) {// 如果匹配请求类型
+				if (pathMatches(urlArray[0], requestURI)) {
+					return filterChainManager.proxy(originalChain, pathPattern);
+				}
+			} else if (urlArray.length == 1) {
+				if (pathMatches(pathPattern, requestURI)) {
+					return filterChainManager.proxy(originalChain, pathPattern);
+				}
+			}
+		}
+		return null;
+	}
 
 }
