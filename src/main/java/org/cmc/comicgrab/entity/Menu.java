@@ -52,7 +52,13 @@ public class Menu implements Serializable {
      */
     @TableField("menu_url_")
     private String menuUrl;
-
+    
+    /**
+     * 请求类型
+     */
+    @TableField("request_type_")
+    private String requestType;
+    
     /**
      * 菜单类型
      */

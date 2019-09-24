@@ -22,7 +22,7 @@ public class ShiroConfig {
 
 	@Bean
 	public ShiroFilterFactoryBean shirFilter(org.apache.shiro.mgt.SecurityManager securityManager) {
-		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+		ShiroFilterFactoryBean shiroFilterFactoryBean = new RestShiroFilterFactoryBean();
 		// 必须设置 SecurityManager
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
 		// setLoginUrl 如果不设置值，默认会自动寻找Web工程根目录下的"/login.jsp"页面 或 "/login" 映射
@@ -36,7 +36,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/web/login", "anon");
 		
 		//filterChainDefinitionMap.put("/manager-user/changePassword", "roles[admin]");//test
-		filterChainDefinitionMap.put("/manager-user/password", "perms[角色管理]");//test
+		//filterChainDefinitionMap.put("/manager-user/password", "perms[角色管理]");//test
 		// 其余接口一律拦截
 		// filterChainDefinitionMap.put("/**", "authc");
 		filterChainDefinitionMap.put("/api/**", "anon");

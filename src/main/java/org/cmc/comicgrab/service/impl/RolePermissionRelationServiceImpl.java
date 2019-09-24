@@ -36,7 +36,7 @@ private MenuMapper menuMapper;
 		Map<String, String> map=new LinkedHashMap<>();
 		QueryWrapper<Menu> queryWrapper=new QueryWrapper<>();
 		queryWrapper.ne("menu_type_", "VOID").eq("sys_status_", Constants.SystemConstants.NORMAL.getValue());
-		menuMapper.selectList(queryWrapper).forEach(menu->map.put(menu.getMenuUrl(), "perms["+menu.getName()+"]"));;
+		menuMapper.selectList(queryWrapper).forEach(menu->map.put(menu.getMenuUrl()+"=="+menu.getRequestType(), "perms["+menu.getName()+"]"));;
 		return map;
 	}
 
