@@ -64,7 +64,12 @@
 
 	<script th:src="@{/login/js/index.js}"></script>
 	<script type="text/javascript">
+	var loadIndex;
 		function submitForm() {
+			layui.use('layer', function() {
+				var layer = layui.layer;
+				loadIndex= layer.load();
+			});
 			$.ajax({
 				type : "post",
 				url : _ctx + '/web/login',
@@ -74,11 +79,13 @@
 					"rememberMe" : true
 				},
 				success : function(result) {
+					
 					if (result.success) {
 						location.href = _ctx + '/web/home'
 					} else {
 						layui.use('layer', function() {
 							var layer = layui.layer;
+							layer.close(loadIndex); 
 							layer.msg("登录失败");
 						});
 					}

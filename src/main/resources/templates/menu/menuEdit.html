@@ -40,6 +40,16 @@
 			</div>
 		</div>
 		<div class="layui-form-item">
+			<label class="layui-form-label">请求类型</label>
+			<div class="layui-input-block" style="width: 80%">
+				<input type="radio" name="requestType" value="NULL"  title="全部" th:checked="${menu.requestType == 'NULL' || menu.requestType == null}">
+				<input type="radio" name="requestType" value="GET" title="GET" th:checked="${menu.requestType =='GET' }">
+				<input type="radio" name="requestType" value="POST" title="POST" th:checked="${menu.requestType =='POST' }"> 
+				<input type="radio" name="requestType" value="PUT" title="PUT" th:checked="${menu.requestType =='PUT'}">
+				<input type="radio" name="requestType" value="DELETE" title="DELETE" th:checked="${menu.requestType =='DELETE'}">
+			</div>
+		</div>
+		<div class="layui-form-item">
 			<div class="layui-input-block">
 				<button class="layui-btn" lay-submit="" lay-filter="submitForm">提交修改</button>
 				<button type="reset" class="layui-btn layui-btn-primary">重新输入</button>

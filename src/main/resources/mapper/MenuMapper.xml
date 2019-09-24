@@ -6,6 +6,7 @@
 		<result column="menu_name_" jdbcType="VARCHAR" property="menuName" />
 		<result column="parent_id_" jdbcType="INTEGER" property="parentId" />
 		<result column="menu_url_" jdbcType="VARCHAR" property="menuUrl" />
+		<result column="request_type_" jdbcType="VARCHAR" property="requestType" />
 		<result column="menu_type_" jdbcType="VARCHAR" property="menuType" />
 		<result column="menu_icon_" jdbcType="VARCHAR" property="menuIcon" />
 		<result column="sys_status_" jdbcType="VARCHAR" property="sysStatus" />
@@ -15,7 +16,7 @@
 
 	<select id="getMenuTree" resultMap="baseResult" parameterType="int">
 		select
-		id_,name_,parent_id_,menu_url_,menu_type_,menu_icon_,sys_status_,create_time_
+		id_,name_,parent_id_,menu_url_,request_type_,menu_type_,menu_icon_,sys_status_,create_time_
 		from menu_
 		where
 		parent_id_=#{parentId}
