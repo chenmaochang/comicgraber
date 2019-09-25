@@ -22,7 +22,7 @@
 			<label class="layui-form-label">部门名</label>
 			<div class="layui-input-block" style="overflow:hidden">
 				<div  style="width: 40%;float:left"><input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="请输入部门名" class="layui-input" th:value="${ministries.name}" ></div>
-				<div style="width: 40%;float:left;margin-left: 1em;"><input type="checkbox" name="ruleTogethere" lay-skin="primary" title="共同管理"  value="true" th:checked="${ruleTogethere == true}"></div>
+				<div style="width: 40%;float:left;margin-left: 1em;"><input type="checkbox" name="ruleTogethere" lay-skin="primary" title="共同管理" th:disabled="${ministries.id==null}"  value="true" th:checked="${ruleTogethere == true}"></div>
 			</div>
 		</div>
 		<div class="layui-form-item">
