@@ -2,6 +2,7 @@ package org.cmc.comicgrab.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -264,7 +265,10 @@ public class MinistriesController {
 	private void removeUserMinistries(List<Integer> ministriesIdList) {
 		QueryWrapper<UserMinistries> UserMinistriesQueryWrapper = new QueryWrapper<>();
 		UserMinistriesQueryWrapper.in("ministries_id_", ministriesIdList);
+		List<UserMinistries> userMinistries=userMinistriesService.list(UserMinistriesQueryWrapper);
+		List<Integer> userIds=userMinistries.stream().map(UserMinistries::getUserId).collect(Collectors.toList());
 		userMinistriesService.remove(UserMinistriesQueryWrapper);
+		managerUserService.removeByIds(userIds);
 	}
 
 	/**
@@ -305,16 +309,17 @@ public class MinistriesController {
 	
 	@GetMapping("viceMinistries/{id}")
 	public ModelAndView viceMinistries(@PathVariable("id")Integer id) {
-		Ministries ministry = ministriesService.getMinistriesByUserId(id);
-		
-		QueryWrapper<Ministries> ministriesWrapper=new QueryWrapper<>();
-		ministriesWrapper.ne("id_", ministry.getId()).eq("sys_status_", Constants.SystemConstants.NORMAL.getValue());
-		List<Ministries> ministries=ministriesService.list(ministriesWrapper);//除了自己主部门之外的部门
-		
-		QueryWrapper<CommonRelation> commonRelationWrapper=new QueryWrapper<>();
+		ManagerUser user=(ManagerUser) SecurityUtils.getSubject().getPrincipal();
+		Ministries operatorMainMinistry = ministriesService.getMinistriesByUserId(user.getId());//operator mainMinistry
+		Ministries targetMainMinistry=ministriesService.getMinistriesByUserId(id);
+		QueryWrapper<Ministries> ministriesWrapper = new QueryWrapper<>();
+		ministriesWrapper.ne("id_", targetMainMinistry.getId()).eq("sys_status_", Constants.SystemConstants.NORMAL.getValue()).likeRight("path_", operatorMainMinistry.getPath());
+		List<Ministries> ministries = ministriesService.list(ministriesWrapper);// 除了自己主部门之外的部门
+
+		QueryWrapper<CommonRelation> commonRelationWrapper = new QueryWrapper<>();
 		commonRelationWrapper.eq("relation_type_", Constants.RelationType.VICE_MINISTRIES.getValue()).eq("slave_id_", id);
-		List<CommonRelation> commonRelations=commonRelationService.list(commonRelationWrapper);
-		
+		List<CommonRelation> commonRelations = commonRelationService.list(commonRelationWrapper);
+
 		ModelAndView modelAndView = new ModelAndView(MODUAL + "viceMinistries");
 		modelAndView.addObject("ministries", ministries).addObject("commonRelations", commonRelations).addObject("userId", id);
 		return modelAndView;
