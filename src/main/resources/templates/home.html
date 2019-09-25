@@ -24,11 +24,11 @@ iframe {
 	<div class="layui-layout layui-layout-admin">
 		<div class="layui-header">
 			<div class="layui-logo">
-				<img src="http://t.cn/RCzsdCq" class="layui-nav-img">漫画分析家
+				<img th:src="@{/images/management.webp}" class="layui-nav-img">漫画分析家
 			</div>
 			<ul class="layui-nav layui-layout-right">
 				<li class="layui-nav-item" id="unread"></li>
-				<li class="layui-nav-item"><a href="javascript:;" onclick="openEditUserWindow()"><img src="http://t.cn/RCzsdCq" class="layui-nav-img" id="head-icon"><shiro:principal property="name"/></a>
+				<li class="layui-nav-item"><a href="javascript:;" onclick="openEditUserWindow()"><img th:src="@{/images/user.webp}" class="layui-nav-img" id="head-icon"><shiro:principal property="name"/></a>
 					<dl class="layui-nav-child">
 						<dd>
 							<a href='javascript:void(0)' onclick="openEditPasswordWindow()">修改密码</a>
