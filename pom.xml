@@ -61,10 +61,9 @@
 			<version>2.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>2.3.29</version>
-		</dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -113,6 +112,11 @@
 			<groupId>cn.edu.hfut.dmic.webcollector</groupId>
 			<artifactId>WebCollector</artifactId>
 			<version>2.73-alpha</version>
+		</dependency>
+		<dependency>
+			<groupId>com.positiondev.epublib</groupId>
+			<artifactId>epublib-core</artifactId>
+			<version>3.1</version>
 		</dependency>
 	</dependencies>
 	<build>
