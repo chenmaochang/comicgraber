@@ -1,10 +1,13 @@
 package org.cmc.comicgrab.service.impl;
 
+import javax.annotation.Resource;
+
 import org.cmc.comicgrab.entity.Book;
 import org.cmc.comicgrab.mapper.BookMapper;
 import org.cmc.comicgrab.service.IBookService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 /**
  * <p>
@@ -16,5 +19,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements IBookService {
+@Resource
+BookMapper bookMapper;
 
 }

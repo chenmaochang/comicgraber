@@ -1,11 +1,14 @@
 package org.cmc.comicgrab.entity;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableField;
-import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -16,12 +19,12 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author cmc
- * @since 2019-09-26
+ * @since 2019-09-27
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName(value="book_")
+@TableName(value="book_",resultMap="baseResult")
 public class Book implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,7 +32,7 @@ public class Book implements Serializable {
     /**
      * 自增主键
      */
-    @TableId("id_")
+    @TableId(value = "id_", type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -51,6 +54,18 @@ public class Book implements Serializable {
     private String coverUrl;
 
     /**
+     * 封面路径
+     */
+    @TableField("cover_src_")
+    private String coverSrc;
+
+    /**
+     * 封面图片 如abc.jpg
+     */
+    @TableField("cover_picture_")
+    private String coverPicture;
+
+    /**
      * 类型
      */
     @TableField("book_type_")
@@ -66,7 +81,7 @@ public class Book implements Serializable {
      * 来源网站弱外键id
      */
     @TableField("source_id_")
-    private Long sourceId;
+    private Integer sourceId;
 
     /**
      * 创建时间
@@ -92,5 +107,7 @@ public class Book implements Serializable {
     @TableField("upload_status_")
     private String uploadStatus;
 
+    @TableField(exist=false)
+    private List<Page> pages;
 
 }

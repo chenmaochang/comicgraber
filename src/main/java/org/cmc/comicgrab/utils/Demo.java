@@ -1,14 +1,10 @@
 package org.cmc.comicgrab.utils;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.google.gson.JsonObject;
-
-import ch.qos.logback.core.util.FileUtil;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.rocks.BreadthCrawler;

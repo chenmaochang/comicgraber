@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.cmc.comicgrab.mapper.BookMapper">
+	<resultMap id="baseResult" type="org.cmc.comicgrab.entity.Book">
+		<id column="id_" jdbcType="INTEGER" property="id" />
+		<result column="book_name_" jdbcType="VARCHAR" property="bookName" />
+		<result column="author_" jdbcType="VARCHAR" property="author" />
+		<result column="cover_url_" jdbcType="VARCHAR" property="coverUrl" />
+		<result column="cover_src_" jdbcType="VARCHAR" property="coverSrc" />
+		<result column="cover_picture_" jdbcType="VARCHAR" property="coverPicture" />
+		<result column="source_website_" jdbcType="VARCHAR" property="sourceWebsite" />
+		<result column="source_id_" jdbcType="BIGINT" property="sourceId" />
+		<result column="create_time_" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="create_ip_" jdbcType="VARCHAR" property="createIp" />
+		<result column="create_id_" jdbcType="INTEGER" property="createId" />
+		<result column="upload_status_" jdbcType="VARCHAR" property="uploadStatus" />
+		<collection column="id_" property="pages" ofType="org.cmc.comicgrab.entity.Page" javaType="java.util.ArrayList"  select="getPages" >
+		</collection>
+	</resultMap>
+	
+	<select id="getPages" resultType="org.cmc.comicgrab.entity.Page" parameterType="int">
+	select id_,page_index_,episode_,page_url_,page_src_,book_id_,book_title_,page_content_ from page_ where book_id_=#{id}
+	</select>
 
 </mapper>
