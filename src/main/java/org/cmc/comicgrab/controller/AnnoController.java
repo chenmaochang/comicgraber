@@ -43,15 +43,23 @@ public class AnnoController {
 		rtnObj.put(Constants.SystemConstants.MESSAGE.getValue(), value);
 		return rtnObj;
 	}
+	/**"https://manhua.zsh8.com/pg/hxssfm/82345.html"
+	 *2019年9月27日 下午5:58:40
+	 * 作者 陈茂昌
+	 * email:chenmc@createw.com
+	 * @param url
+	 * @return
+	 * @throws Exception
+	 */
 	@GetMapping("test")
-	public JSONObject test() throws Exception{
+	public JSONObject test(@RequestParam("url")String url) throws Exception{
 		/*List<String> pics=new ArrayList<>();
 		pics.add("d:/火星丧尸/第001话/2.jpg");
 		epubUtils.makeBook("一本漫画", "某人", pics);*/
 		/*Map<String, Object> map=new HashMap<>();
 		map.put("singlePage", "123123.jpg");
 		FreeMarkerUtils.createHtml("nomalPage.ftl", "d:/asdasd.html", map);*/
-		ZhishihaobaCrawler zhishihaoba = new ZhishihaobaCrawler(bookConfig.getWebControllerStorePath(), false, "https://manhua.zsh8.com/pg/hxssfm/82345.html",bookConfig.getBookStorePath());
+		ZhishihaobaCrawler zhishihaoba = new ZhishihaobaCrawler(bookConfig.getWebControllerStorePath(), false, url,bookConfig.getBookStorePath());
 		zhishihaoba.start(2);
 		Book book=zhishihaoba.getBook();
 		List<Page> pages=zhishihaoba.getPages();
