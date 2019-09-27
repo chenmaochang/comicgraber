@@ -11,23 +11,46 @@ import org.jsoup.select.Elements;
 import cn.edu.hfut.dmic.webcollector.model.CrawlDatums;
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import cn.edu.hfut.dmic.webcollector.plugin.rocks.BreadthCrawler;
-import lombok.Data;
 
 /**芝士豪八Crawler
  * @author admin
  *
  */
-@Data
 public class ZhishihaobaCrawler extends BreadthCrawler {
 	private Book book;
 	private List<org.cmc.comicgrab.entity.Page> pages;
 	private String bookStorePath;
 	
+	
+	public Book getBook() {
+		return book;
+	}
+
+	public void setBook(Book book) {
+		this.book = book;
+	}
+
+	public List<org.cmc.comicgrab.entity.Page> getPages() {
+		return pages;
+	}
+
+	public void setPages(List<org.cmc.comicgrab.entity.Page> pages) {
+		this.pages = pages;
+	}
+
+	public String getBookStorePath() {
+		return bookStorePath;
+	}
+
+	public void setBookStorePath(String bookStorePath) {
+		this.bookStorePath = bookStorePath;
+	}
+
 	public ZhishihaobaCrawler(String crawlPath, boolean autoParse, String startPageUrl,String dataStorePath) {
 		super(crawlPath, autoParse);
 		this.addSeedAndReturn(startPageUrl).type("list");
 		this.bookStorePath=dataStorePath;
-		setThreads(5);
+		setThreads(3);
 	}
 
 	@Override
@@ -35,8 +58,11 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 		if (page.matchType("list")) {//每本
 			Elements episodes = page.select(".blog-shortcode-post-title");
 			String title = page.selectText(".fusion-post-title");
-			String coverPictureUrl = page.select(".alignnone", 0).absUrl("src");
+			System.out.println("标题"+title);
+			String coverPictureUrl = (page.select(".fusion-text", 0)).selectFirst("div").selectFirst("div").selectFirst("img").absUrl("src");
+			System.out.println("封面url"+coverPictureUrl);
 			String pathName = bookStorePath+"/" + title + "/";
+			System.out.println("文档路径"+pathName);
 			File comicFolder = new File(pathName);
 			if (!comicFolder.exists()) {
 				comicFolder.mkdir();
@@ -54,6 +80,7 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 					chapterFoler.mkdir();
 				}
 				CrawlDatums crawlDatums = new CrawlDatums();
+				System.out.println(entrance.absUrl("href"));
 				crawlDatums.addAndReturn(entrance.absUrl("href"));
 				crawlDatums.type("comic");
 				crawlDatums.meta("title", title).meta("chapter", chapter).meta("parentPath", pathName + chapter + "/");
@@ -63,7 +90,7 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 			Elements elements = page.select(".gallery-item");
 			for (int i = 0; i < elements.size(); i++) {
 				Element element = elements.get(i);
-				String pageUrl = element.selectFirst("a").absUrl("href");
+				String pageUrl = element.selectFirst("a").selectFirst("img").absUrl("src");
 				String pageSrc = FileUtils.saveFile(pageUrl, page.meta("parentPath") + i);
 				org.cmc.comicgrab.entity.Page bookPage = new org.cmc.comicgrab.entity.Page();
 				bookPage.setPageIndex(i).setPageSrc(pageSrc).setPageUrl(pageUrl).setEpisode(page.meta("chapter"));

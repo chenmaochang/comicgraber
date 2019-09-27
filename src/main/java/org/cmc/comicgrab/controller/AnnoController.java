@@ -1,6 +1,7 @@
 package org.cmc.comicgrab.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Resource;
 
@@ -53,16 +54,19 @@ public class AnnoController {
 	 */
 	@GetMapping("test")
 	public JSONObject test(@RequestParam("url")String url) throws Exception{
+		url="https://manhua.zsh8.com/pg/rolerolefm/131241.html";
 		/*List<String> pics=new ArrayList<>();
 		pics.add("d:/火星丧尸/第001话/2.jpg");
 		epubUtils.makeBook("一本漫画", "某人", pics);*/
 		/*Map<String, Object> map=new HashMap<>();
 		map.put("singlePage", "123123.jpg");
 		FreeMarkerUtils.createHtml("nomalPage.ftl", "d:/asdasd.html", map);*/
-		ZhishihaobaCrawler zhishihaoba = new ZhishihaobaCrawler(bookConfig.getWebControllerStorePath(), false, url,bookConfig.getBookStorePath());
+		ZhishihaobaCrawler zhishihaoba = new ZhishihaobaCrawler(bookConfig.getWebControllerStorePath()+"/"+UUID.randomUUID().toString(), false, url,bookConfig.getBookStorePath());
 		zhishihaoba.start(2);
 		Book book=zhishihaoba.getBook();
 		List<Page> pages=zhishihaoba.getPages();
+		System.out.println(book);
+		System.out.println(pages);
 		bookService.save(book);
 		pages.forEach(page->page.setBookId(book.getId()));
 		pageService.saveBatch(pages);
