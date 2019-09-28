@@ -54,7 +54,7 @@ public class AnnoController {
 	 */
 	@GetMapping("test")
 	public JSONObject test(@RequestParam("url")String url) throws Exception{
-		url="https://manhua.zsh8.com/pg/rolerolefm/131241.html";
+		url="https://manhua.zsh8.com/pg/zmdhgffm/94591.html";
 		/*List<String> pics=new ArrayList<>();
 		pics.add("d:/火星丧尸/第001话/2.jpg");
 		epubUtils.makeBook("一本漫画", "某人", pics);*/
