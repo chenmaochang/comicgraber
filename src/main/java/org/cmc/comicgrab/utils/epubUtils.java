@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
+import cn.edu.hfut.dmic.webcollector.model.Page;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
@@ -44,7 +46,8 @@ public class epubUtils {
 		metadata.addTitle(customBook.getBookName());
 		metadata.addAuthor(new Author(customBook.getAuthor()));
 		book.setCoverImage(getResource(customBook.getCoverSrc(), customBook.getCoverPicture()));
-		for (int i = 0; i < customBook.getPages().size(); i++) {
+		List<org.cmc.comicgrab.entity.Page> pages=customBook.getPages();
+		for (int i = 0; i < pages.size(); i++) {
 			book.addSection(customBook.getBookName() + "-" + i, getResource("d:/normalPage.html", i + "normalPage.html"));
 			book.getResources().add(getResource("d:/火星丧尸/第001话/0.jpg", "page.jpg"));
 		}

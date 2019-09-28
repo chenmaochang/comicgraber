@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import org.cmc.comicgrab.entity.Book;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
@@ -31,4 +32,5 @@ public class FreeMarkerUtils {
 		file.flush();
 		file.close();
     }
+	
 }

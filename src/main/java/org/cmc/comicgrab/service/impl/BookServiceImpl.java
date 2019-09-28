@@ -6,6 +6,7 @@ import org.cmc.comicgrab.entity.Book;
 import org.cmc.comicgrab.mapper.BookMapper;
 import org.cmc.comicgrab.service.IBookService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -18,6 +19,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  * @since 2019-09-26
  */
 @Service
+@Transactional
 public class BookServiceImpl extends ServiceImpl<BookMapper, Book> implements IBookService {
 @Resource
 BookMapper bookMapper;
