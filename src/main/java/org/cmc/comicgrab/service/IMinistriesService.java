@@ -31,7 +31,7 @@ public interface IMinistriesService extends IService<Ministries> {
 	 * @param ministries
 	 */
 	default void generatePath(Ministries ministries) {
-		if(ministries.getParentId()!=0) {
+		if(ministries.getParentId()!=null&&ministries.getParentId()!=0) {
 			Ministries parentMinistries=getById(ministries.getParentId());
 			ministries.setPath(parentMinistries.getPath()+"-"+ministries.getId());
 		}else {

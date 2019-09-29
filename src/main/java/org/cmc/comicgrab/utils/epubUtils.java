@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.cmc.comicgrab.entity.Episode;
+
 import cn.edu.hfut.dmic.webcollector.model.Page;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
@@ -46,13 +48,19 @@ public class epubUtils {
 		metadata.addTitle(customBook.getBookName());
 		metadata.addAuthor(new Author(customBook.getAuthor()));
 		book.setCoverImage(getResource(customBook.getCoverSrc(), customBook.getCoverPicture()));
-		List<org.cmc.comicgrab.entity.Page> pages=customBook.getPages();
+		List<Episode> episodes=customBook.getEpisodes();
+		
+		/*List<org.cmc.comicgrab.entity.Page> pages=customBook.getPages();
 		for (int i = 0; i < pages.size(); i++) {
 			book.addSection(customBook.getBookName() + "-" + i, getResource("d:/normalPage.html", i + "normalPage.html"));
-			book.getResources().add(getResource("d:/火星丧尸/第001话/0.jpg", "page.jpg"));
-		}
+			book.getResources().add(getResource("d://第001话/0.jpg", "page.jpg"));
+		}*/
 		EpubWriter epubWriter = new EpubWriter();
 		epubWriter.write(book, new FileOutputStream("d:/my.epub"));
+	}
+	
+	private void genrateBookHtml() {
+		
 	}
 
 	public static void main(String[] args) {

@@ -10,6 +10,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.cmc.comicgrab.entity.Episode;
+import org.cmc.comicgrab.entity.Page;
 
 public class FileUtils {
 	public static String saveFile(String src, String targetPath){

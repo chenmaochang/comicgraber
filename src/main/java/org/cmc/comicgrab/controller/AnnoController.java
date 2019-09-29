@@ -9,6 +9,7 @@ import javax.annotation.Resource;
 import org.cmc.comicgrab.common.Constants;
 import org.cmc.comicgrab.configure.custom.BookConfig;
 import org.cmc.comicgrab.entity.Book;
+import org.cmc.comicgrab.entity.Episode;
 import org.cmc.comicgrab.entity.Page;
 import org.cmc.comicgrab.service.IBookService;
 import org.cmc.comicgrab.service.IPageService;
@@ -49,7 +50,7 @@ public class AnnoController {
 		rtnObj.put(Constants.SystemConstants.SUCCESS.getValue(), true);
 		rtnObj.put(Constants.SystemConstants.MESSAGE.getValue(), "请求已经提交,请等候执行");
 		
-		CompletableFuture<Book> future = CompletableFuture.supplyAsync(() -> test(value));
+		CompletableFuture<Void> future = CompletableFuture.runAsync(() -> test(value));
 		//future.whenCompleteAsync(()->{});
 		return rtnObj;
 	}
@@ -62,7 +63,7 @@ public class AnnoController {
 	 * @return
 	 * @throws Exception
 	 */
-	public Book test(String url) {
+	public void test(String url) {
 		// url="https://manhua.zsh8.com/pg/zmdhgffm/94591.html";
 		/*
 		 * List<String> pics=new ArrayList<>(); pics.add("d:/火星丧尸/第001话/2.jpg");
@@ -83,14 +84,14 @@ public class AnnoController {
 			e.printStackTrace();
 		}
 		Book book = zhishihaoba.getBook();
-		List<Page> pages = zhishihaoba.getPages();
+		List<Episode> episodes=zhishihaoba.getBookEpisodes();
 		System.out.println(book);
-		System.out.println(pages.size());
-		System.out.println(bookService.save(book));
+		System.out.println(episodes);
+		/*//List<Page> pages = zhishihaoba.getPages();
+		bookService.save(book);
 		pages.forEach(page -> page.setBookId(book.getId()));
-		System.out.println(pageService.saveBatch(pages));
-		book.setPages(pages);
-		return book;
+		pageService.saveBatch(pages);
+		book.setPages(pages);*/
 	}
 	/*
 	 * private void makeBookHTML(Book book){

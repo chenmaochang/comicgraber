@@ -108,6 +108,6 @@ public class Book implements Serializable {
     private String uploadStatus;
 
     @TableField(exist=false)
-    private List<Page> pages;
+    private List<Episode> episodes;
 
 }

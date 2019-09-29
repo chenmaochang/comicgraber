@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.cmc.comicgrab.mapper.EpisodeMapper">
+	<resultMap id="baseResult" type="org.cmc.comicgrab.entity.Episode">
+		<id column="id_" jdbcType="INTEGER" property="id" />
+		<result column="index_" jdbcType="SMALLINT" property="index" />
+		<result column="index_name_" jdbcType="VARCHAR" property="indexName_" />
+		<result column="book_name_" jdbcType="VARCHAR" property="bookName" />
+		<result column="book_id_" jdbcType="INTEGER" property="bookId" />
+		<collection column="id_" property="episodes" ofType="org.cmc.comicgrab.entity.Page" javaType="java.util.ArrayList" select="getPages">
+		</collection>
+	</resultMap>
+	<select id="getPages" resultType="org.cmc.comicgrab.entity.Page" parameterType="int">
+	 select * from page_ where episode_id_=#{id}
+	</select>
+</mapper>

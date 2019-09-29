@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cmc.comicgrab.entity.Book;
+import org.cmc.comicgrab.entity.Episode;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -18,10 +19,9 @@ import cn.edu.hfut.dmic.webcollector.plugin.rocks.BreadthCrawler;
  */
 public class ZhishihaobaCrawler extends BreadthCrawler {
 	private Book book;
-	private List<org.cmc.comicgrab.entity.Page> pages;
 	private String bookStorePath;
-	
-	
+	private List<Episode> bookEpisodes = new ArrayList<>();
+
 	public Book getBook() {
 		return book;
 	}
@@ -30,13 +30,6 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 		this.book = book;
 	}
 
-	public List<org.cmc.comicgrab.entity.Page> getPages() {
-		return pages;
-	}
-
-	public void setPages(List<org.cmc.comicgrab.entity.Page> pages) {
-		this.pages = pages;
-	}
 
 	public String getBookStorePath() {
 		return bookStorePath;
@@ -46,30 +39,38 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 		this.bookStorePath = bookStorePath;
 	}
 
-	public ZhishihaobaCrawler(String crawlPath, boolean autoParse, String startPageUrl,String dataStorePath) {
+	public List<Episode> getBookEpisodes() {
+		return bookEpisodes;
+	}
+
+	public void setBookEpisodes(List<Episode> bookEpisodes) {
+		this.bookEpisodes = bookEpisodes;
+	}
+
+	public ZhishihaobaCrawler(String crawlPath, boolean autoParse, String startPageUrl, String dataStorePath) {
 		super(crawlPath, autoParse);
 		this.addSeedAndReturn(startPageUrl).type("list");
-		this.bookStorePath=dataStorePath;
+		this.bookStorePath = dataStorePath;
 		setThreads(3);
 	}
 
 	@Override
 	public void visit(Page page, CrawlDatums next) {
-		if (page.matchType("list")) {//每本
+		if (page.matchType("list")) {// 每本
 			Elements episodes = page.select(".blog-shortcode-post-title");
 			String title = page.selectText(".fusion-post-title");
-			System.out.println("标题"+title);
+			System.out.println("标题" + title);
 			String coverPictureUrl = (page.select(".fusion-text", 0)).selectFirst("div").selectFirst("div").selectFirst("img").absUrl("src");
-			System.out.println("封面url"+coverPictureUrl);
-			String pathName = bookStorePath+"/" + title + "/";
-			System.out.println("文档路径"+pathName);
+			System.out.println("封面url" + coverPictureUrl);
+			String pathName = bookStorePath + "/" + title + "/";
+			System.out.println("文档路径" + pathName);
 			File comicFolder = new File(pathName);
 			if (!comicFolder.exists()) {
 				comicFolder.mkdir();
 			}
 			String coverSrc = FileUtils.saveFile(coverPictureUrl, pathName + title);
 			String coverSuffix = coverSrc.substring(coverSrc.lastIndexOf("."), coverSrc.length());
-			Book book=new Book();
+			Book book = new Book();
 			book.setAuthor(page.selectText("td", 1)).setBookName(title).setCoverPicture(title + coverSuffix).setCoverUrl(coverPictureUrl).setCoverSrc(coverSrc).setSourceWebsite(page.url());
 			this.setBook(book);
 			episodes.forEach(episode -> {
@@ -79,14 +80,16 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 				if (!chapterFoler.exists()) {
 					chapterFoler.mkdir();
 				}
+				Episode singleEpisode = new Episode();
+				singleEpisode.setBookName(title).setIndexName(chapter);
+				this.bookEpisodes.add(singleEpisode);
 				CrawlDatums crawlDatums = new CrawlDatums();
-				System.out.println(entrance.absUrl("href"));
 				crawlDatums.addAndReturn(entrance.absUrl("href"));
 				crawlDatums.type("comic");
 				crawlDatums.meta("title", title).meta("chapter", chapter).meta("parentPath", pathName + chapter + "/");
 				next.add(crawlDatums);
 			});
-		} else if (page.matchType("comic")) {//每集
+		} else if (page.matchType("comic")) {// 每集
 			Elements elements = page.select(".gallery-item");
 			for (int i = 0; i < elements.size(); i++) {
 				Element element = elements.get(i);
@@ -94,14 +97,15 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 				String pageSrc = FileUtils.saveFile(pageUrl, page.meta("parentPath") + i);
 				org.cmc.comicgrab.entity.Page bookPage = new org.cmc.comicgrab.entity.Page();
 				bookPage.setPageIndex(i).setPageSrc(pageSrc).setPageUrl(pageUrl).setEpisode(page.meta("chapter"));
-				List<org.cmc.comicgrab.entity.Page> list=this.getPages();
-				if(list==null) {
-					list=new ArrayList<>();
+				System.out.println(bookEpisodes);
+				Episode myEpisode = this.bookEpisodes.stream().filter(bookEpisode -> bookEpisode.getIndexName().equals(page.meta("chapter"))).findFirst().get();
+
+				if (myEpisode.getPages() == null) {
+					myEpisode.setPages(new ArrayList<>());
+					myEpisode.getPages().add(bookPage);
 				}
-				list.add(bookPage);
-				this.setPages(list);
-			}	
+			}
 		}
 	}
-
+	
 }

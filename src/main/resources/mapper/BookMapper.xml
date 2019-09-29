@@ -14,12 +14,12 @@
 		<result column="create_ip_" jdbcType="VARCHAR" property="createIp" />
 		<result column="create_id_" jdbcType="INTEGER" property="createId" />
 		<result column="upload_status_" jdbcType="VARCHAR" property="uploadStatus" />
-		<collection column="id_" property="pages" ofType="org.cmc.comicgrab.entity.Page" javaType="java.util.ArrayList"  select="getPages" >
+		<collection column="id_" property="episodes" ofType="org.cmc.comicgrab.entity.Episode" javaType="java.util.ArrayList"  select="getEpisodes" >
 		</collection>
 	</resultMap>
 	
-	<select id="getPages" resultType="org.cmc.comicgrab.entity.Page" parameterType="int">
-	select id_,page_index_,episode_,page_url_,page_src_,book_id_,book_title_,page_content_ from page_ where book_id_=#{id}
+	<select id="getEpisodes" resultType="org.cmc.comicgrab.entity.Episode" parameterType="int">
+	select * from episode_ where book_id_=#{id}
 	</select>
 
 </mapper>
