@@ -9,16 +9,16 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.cmc.comicgrab.entity.Episode;
+import org.cmc.comicgrab.entity.Page;
 
-import cn.edu.hfut.dmic.webcollector.model.Page;
+import lombok.extern.slf4j.Slf4j;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Metadata;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.epub.EpubWriter;
-
-public class epubUtils {
+public class EpubUtils {
 	
 	private static InputStream getResource(String path) throws FileNotFoundException {
 		File file = new File(path);
@@ -42,26 +42,31 @@ public class epubUtils {
 		return book;
 	}
 
-	public static void makeBook(org.cmc.comicgrab.entity.Book customBook) throws IOException {
-		Book book = new Book();
-		Metadata metadata = book.getMetadata();
-		metadata.addTitle(customBook.getBookName());
-		metadata.addAuthor(new Author(customBook.getAuthor()));
-		book.setCoverImage(getResource(customBook.getCoverSrc(), customBook.getCoverPicture()));
-		List<Episode> episodes=customBook.getEpisodes();
-		
-		/*List<org.cmc.comicgrab.entity.Page> pages=customBook.getPages();
-		for (int i = 0; i < pages.size(); i++) {
-			book.addSection(customBook.getBookName() + "-" + i, getResource("d:/normalPage.html", i + "normalPage.html"));
-			book.getResources().add(getResource("d://第001话/0.jpg", "page.jpg"));
-		}*/
-		EpubWriter epubWriter = new EpubWriter();
-		epubWriter.write(book, new FileOutputStream("d:/my.epub"));
+	public static void makeBook(org.cmc.comicgrab.entity.Book customBook) {
+		try {
+			List<Episode> episodes=customBook.getEpisodes();
+			for(int i=0;i<episodes.size();i++){
+				Episode episode=episodes.get(i);
+				List<org.cmc.comicgrab.entity.Page> pages=episodes.get(i).getPages();
+				Book book = new Book();
+				Metadata metadata = book.getMetadata();
+				metadata.addTitle(customBook.getBookName());
+				metadata.addAuthor(new Author(customBook.getAuthor()));
+				book.setCoverImage(getResource(customBook.getCoverSrc(), customBook.getCoverPicture()));
+				for(int j=0;j<pages.size();j++){
+					Page page=pages.get(j);
+					book.addSection(episode.getIndexName(), getResource(page.getPageContent(), i + "normalPage.html"));
+					book.getResources().add(getResource(page.getPageSrc(), page.getPageSrc()));
+				}
+				EpubWriter epubWriter = new EpubWriter();
+				epubWriter.write(book, new FileOutputStream("d:/"+customBook.getBookName()+"-"+episode.getIndexName()+".epub"));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
-	private void genrateBookHtml() {
-		
-	}
 
 	public static void main(String[] args) {
 
@@ -101,7 +106,17 @@ public class epubUtils {
 			EpubWriter epubWriter = new EpubWriter();
 
 			// Write the Book as Epub
-			epubWriter.write(book, new FileOutputStream("d:/test1_book1.epub"));
+			epubWriter.write(book, new FileOutputStream(new File("d:/test中文_book1.epub")));
+			
+			/*Book book = new Book();
+			Metadata metadata = book.getMetadata();
+			metadata.addTitle("炼狱都市");
+			metadata.addAuthor(new Author("王八蛋"));
+			book.setCoverImage(getResource("d:/books/恋狱都市/恋狱都市.jpg", "恋狱都市.jpg"));
+			book.addSection("第一集", getResource("d:/books/恋狱都市/第001话/1.html", "1.html"));
+			book.getResources().add(getResource("d:/books/恋狱都市/第001话/1.jpg", "1.jpg"));
+			EpubWriter epubWriter = new EpubWriter();
+			epubWriter.write(book, new FileOutputStream("d:/炼狱都市-1.epub"));*/
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

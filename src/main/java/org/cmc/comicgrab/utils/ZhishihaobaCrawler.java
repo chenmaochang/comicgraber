@@ -2,7 +2,9 @@ package org.cmc.comicgrab.utils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.cmc.comicgrab.entity.Book;
 import org.cmc.comicgrab.entity.Episode;
@@ -59,11 +61,8 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 		if (page.matchType("list")) {// 每本
 			Elements episodes = page.select(".blog-shortcode-post-title");
 			String title = page.selectText(".fusion-post-title");
-			System.out.println("标题" + title);
 			String coverPictureUrl = (page.select(".fusion-text", 0)).selectFirst("div").selectFirst("div").selectFirst("img").absUrl("src");
-			System.out.println("封面url" + coverPictureUrl);
 			String pathName = bookStorePath + "/" + title + "/";
-			System.out.println("文档路径" + pathName);
 			File comicFolder = new File(pathName);
 			if (!comicFolder.exists()) {
 				comicFolder.mkdir();
@@ -94,16 +93,15 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 			for (int i = 0; i < elements.size(); i++) {
 				Element element = elements.get(i);
 				String pageUrl = element.selectFirst("a").selectFirst("img").absUrl("src");
-				String pageSrc = FileUtils.saveFile(pageUrl, page.meta("parentPath") + i);
+				String pageFileName=page.meta("parentPath") + i;
+				String pageSrc = FileUtils.saveFile(pageUrl, pageFileName);
+				Map<String, Object> map=new HashMap<>(); 
+				map.put("singlePage",pageSrc);
+				FreeMarkerUtils.createHtml("nomalPage.ftl",pageFileName+".html", map);
 				org.cmc.comicgrab.entity.Page bookPage = new org.cmc.comicgrab.entity.Page();
-				bookPage.setPageIndex(i).setPageSrc(pageSrc).setPageUrl(pageUrl).setEpisode(page.meta("chapter"));
-				System.out.println(bookEpisodes);
+				bookPage.setPageIndex(i).setPageContent(pageFileName+".html").setPageSrc(pageSrc).setPageUrl(pageUrl).setEpisode(page.meta("chapter"));
 				Episode myEpisode = this.bookEpisodes.stream().filter(bookEpisode -> bookEpisode.getIndexName().equals(page.meta("chapter"))).findFirst().get();
-
-				if (myEpisode.getPages() == null) {
-					myEpisode.setPages(new ArrayList<>());
-					myEpisode.getPages().add(bookPage);
-				}
+				myEpisode.getPages().add(bookPage);
 			}
 		}
 	}

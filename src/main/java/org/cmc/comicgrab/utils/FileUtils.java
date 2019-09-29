@@ -20,7 +20,6 @@ public class FileUtils {
 	public static String saveFile(String src, String targetPath){
 		try {
 			URL imgUrl = new URL(URLEncoder.encode(src, "UTF-8").replace("%2F", "/").replace("%3A", ":").replace("%3F", "?").replace("%3D", "=").replace("%2C", ","));
-			System.out.println(imgUrl);
 			String suffix = src.contains(".jpg")?".jpg":(src.contains(".png")?".png":((src.contains(".jpeg")?".jpeg":(src.contains(".bmp")?".bmp":""))));
 			URLConnection connection = imgUrl.openConnection();
 			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36)");

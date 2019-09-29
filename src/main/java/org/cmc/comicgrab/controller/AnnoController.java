@@ -15,6 +15,7 @@ import org.cmc.comicgrab.service.IBookService;
 import org.cmc.comicgrab.service.IPageService;
 import org.cmc.comicgrab.utils.FileUtils;
 import org.cmc.comicgrab.utils.ZhishihaobaCrawler;
+import org.cmc.comicgrab.utils.EpubUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,8 +86,9 @@ public class AnnoController {
 		}
 		Book book = zhishihaoba.getBook();
 		List<Episode> episodes=zhishihaoba.getBookEpisodes();
-		System.out.println(book);
-		System.out.println(episodes);
+		book.setEpisodes(episodes);
+		EpubUtils.makeBook(book);
+		
 		/*//List<Page> pages = zhishihaoba.getPages();
 		bookService.save(book);
 		pages.forEach(page -> page.setBookId(book.getId()));
