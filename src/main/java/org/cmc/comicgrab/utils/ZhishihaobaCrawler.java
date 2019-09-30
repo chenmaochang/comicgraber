@@ -70,7 +70,7 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 			String coverSrc = FileUtils.saveFile(coverPictureUrl, pathName + title);
 			String coverSuffix = coverSrc.substring(coverSrc.lastIndexOf("."), coverSrc.length());
 			Book book = new Book();
-			book.setAuthor(page.selectText("td", 1)).setBookName(title).setCoverPicture(title + coverSuffix).setCoverUrl(coverPictureUrl).setCoverSrc(coverSrc).setSourceWebsite(page.url());
+			book.setAuthor(page.selectText("td", 1)).setBookPath(pathName).setBookName(title).setCoverPicture(title + coverSuffix).setCoverUrl(coverPictureUrl).setCoverSrc(coverSrc).setSourceWebsite(page.url());
 			this.setBook(book);
 			episodes.forEach(episode -> {
 				Element entrance = episode.selectFirst("a");
@@ -92,11 +92,11 @@ public class ZhishihaobaCrawler extends BreadthCrawler {
 			Elements elements = page.select(".gallery-item");
 			for (int i = 0; i < elements.size(); i++) {
 				Element element = elements.get(i);
-				String pageUrl = element.selectFirst("a").selectFirst("img").absUrl("src");
+				String pageUrl = element.selectFirst("a")./*absUrl("href");*/selectFirst("img").absUrl("src");
 				String pageFileName=page.meta("parentPath") + i;
 				String pageSrc = FileUtils.saveFile(pageUrl, pageFileName);
 				Map<String, Object> map=new HashMap<>(); 
-				map.put("singlePage",pageSrc);
+				map.put("singlePage",EpubUtils.getResourceName(pageSrc));
 				FreeMarkerUtils.createHtml("nomalPage.ftl",pageFileName+".html", map);
 				org.cmc.comicgrab.entity.Page bookPage = new org.cmc.comicgrab.entity.Page();
 				bookPage.setPageIndex(i).setPageContent(pageFileName+".html").setPageSrc(pageSrc).setPageUrl(pageUrl).setEpisode(page.meta("chapter"));

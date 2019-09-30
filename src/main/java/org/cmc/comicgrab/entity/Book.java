@@ -109,5 +109,6 @@ public class Book implements Serializable {
 
     @TableField(exist=false)
     private List<Episode> episodes;
-
+    @TableField(exist=false)
+    private String bookPath;
 }

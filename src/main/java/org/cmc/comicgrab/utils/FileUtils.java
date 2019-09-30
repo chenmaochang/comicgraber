@@ -1,6 +1,7 @@
 package org.cmc.comicgrab.utils;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,11 +11,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.cmc.comicgrab.entity.Episode;
-import org.cmc.comicgrab.entity.Page;
 
 public class FileUtils {
 	public static String saveFile(String src, String targetPath){
@@ -51,4 +47,18 @@ public class FileUtils {
 		}
 		return "";
 	}
+	
+	public static boolean delFile(File file) {
+        if (!file.exists()) {
+            return false;
+        }
+
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            for (File f : files) {
+                delFile(f);
+            }
+        }
+        return file.delete();
+    }
 }

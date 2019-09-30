@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>${singlePage}</title>
+    <title></title>
 </head>
 <body>
 <img src="${singlePage}" alt="${singlePage}" />

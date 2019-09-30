@@ -61,9 +61,9 @@
 			<version>2.1</version>
 		</dependency>
 		<dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-freemarker</artifactId>
-        </dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -117,6 +117,12 @@
 			<groupId>com.positiondev.epublib</groupId>
 			<artifactId>epublib-core</artifactId>
 			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.zeroturnaround</groupId>
+			<artifactId>zt-zip</artifactId>
+			<version>1.13</version>
+			<type>jar</type>
 		</dependency>
 	</dependencies>
 	<build>
